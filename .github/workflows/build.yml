@@ -21,4 +21,15 @@ jobs:
       run: npm install
 
     - name: Run APK Build
-      run: npm start
+      run: |
+        npm start &
+        sleep 15
+        pkill -f node || true
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-android-app
+        path: |
+          *.apk
+          **/*.apk
