@@ -5,5 +5,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = "My Web App"
+rootProject.name = "myapp"
 include ':app'
