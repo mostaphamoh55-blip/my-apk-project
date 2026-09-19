@@ -10,27 +10,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Run APK Build
-        run: |
-          npm start &
-          sleep 15
-          pkill -f node || true
+    - name: Run APK Build
+      run: |
+        npm start &
+        sleep 15
+        pkill -f node || true
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-android-app
-          path: |
-            *.apk
-            **/*.apk
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-android-app
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          app/build/outputs/apk/release/*.apk
