@@ -3054,7 +3054,7 @@ self.addEventListener('fetch', event => {
 
         // Backend endpoint used for real Android APK compilation.
         // Replace this URL with your deployed Node.js backend.
-        const APK_BUILD_API = 'https://YOUR-BACKEND-SERVER.com/api/build/apk';
+        const APK_BUILD_API = 'https://my-apk-project.onrender.com/api/build/apk';
 
         function uint8ArrayToBase64(bytes) {
             if (!bytes || !bytes.length) return '';
