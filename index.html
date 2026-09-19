@@ -554,8 +554,45 @@
         </div>
 
         <div class="bg-slate-200/70 p-1 rounded-xl flex text-xs font-semibold">
-            <button class="flex-1 bg-white py-2 rounded-lg shadow-sm text-slate-800 flex items-center justify-center gap-1.5"><i class="fa-solid fa-globe text-blue-600"></i> HTML / CSS / JS</button>
-            <button class="flex-1 py-2 text-slate-500 flex items-center justify-center gap-1.5"><i class="fa-solid fa-code text-slate-500"></i> Kotlin / Java</button>
+            <button type="button" id="buildSourceUrlTab" onclick="setBuildSourceMode('url')" class="flex-1 bg-white py-2 rounded-lg shadow-sm text-slate-800 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-globe text-blue-600"></i> Website URL
+            </button>
+            <button type="button" id="buildSourceHtmlTab" onclick="setBuildSourceMode('html')" class="flex-1 py-2 text-slate-500 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-code text-slate-500"></i> HTML / CSS / JS
+            </button>
+        </div>
+
+        <div id="buildSourceCard" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-blue-600 font-bold text-sm">
+                    <span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs"><i class="fa-solid fa-link"></i></span>
+                    <span>APK Source</span>
+                </div>
+                <span id="buildSourceBadge" class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">WEBSITE</span>
+            </div>
+
+            <div id="buildUrlSourcePanel" class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase">WEBSITE URL *</label>
+                <div class="relative">
+                    <i class="fa-solid fa-globe absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="url" id="appWebsiteUrlInput" value="https://mywebsite.com" placeholder="https://example.com"
+                        class="w-full border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-blue-600">
+                </div>
+                <p class="text-[10px] text-slate-400">The APK will open this website inside the Android WebView.</p>
+            </div>
+
+            <div id="buildHtmlSourcePanel" class="hidden space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-slate-500 uppercase">HTML SOURCE</label>
+                    <button type="button" onclick="openHtmlEditorForBuild()" class="text-[10px] font-bold text-blue-600 hover:text-blue-700">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i>Open Editor
+                    </button>
+                </div>
+                <textarea id="buildHtmlInput" rows="8" spellcheck="false"
+                    placeholder="Paste your complete HTML here, or use Open Editor to edit your project..."
+                    class="w-full bg-slate-900 text-slate-100 border border-slate-800 rounded-xl px-3 py-3 text-[11px] font-mono leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <p class="text-[10px] text-slate-400">Custom CSS and JavaScript from Advanced Settings will also be added by the backend.</p>
+            </div>
         </div>
 
         <!-- Section 1: App Information -->
@@ -573,16 +610,9 @@
                 <input type="text" id="appPackageInput" value="com.ff.app" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600">
                 <span class="text-[10px] text-slate-400 mt-0.5 block">Lowercase, dot-separated</span>
             </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">APP SOURCE</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <button class="bg-blue-600 text-white text-xs font-bold py-2 rounded-xl shadow-sm">Website URL</button>
-                    <button class="bg-slate-100 text-slate-600 text-xs font-bold py-2 rounded-xl">My Projects</button>
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">WEBSITE URL *</label>
-                <input type="text" id="appWebsiteUrlInput" value="https://mywebsite.com" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600">
+            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-start gap-2">
+                <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+                <p class="text-[10px] leading-4 text-slate-500">Choose <b>Website URL</b> or <b>HTML / CSS / JS</b> from the APK Source section above. The selected source is sent directly to your Android build server.</p>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <div>
@@ -683,7 +713,7 @@
                         <span class="text-[9px] text-slate-400">Press back twice to exit</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" checked class="sr-only peer">
+                        <input type="checkbox" id="buildExitConfirmation" checked class="sr-only peer">
                         <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                 </div>
@@ -1353,6 +1383,7 @@
         let currentPlanName = 'Gold';
         let currentPlanPrice = 100;
         let selectedProjectType = 'WebView';
+        window.devloBuildSourceMode = 'url';
         let currentSelectedPaymentMethod = 'bkash';
 
         // Active project configuration state. The WebView URL is kept here and
@@ -1802,6 +1833,7 @@
         function selectProjectType(element, typeName) {
             selectedProjectType = typeName;
             window.currentProjectConfig.type = typeName;
+            setBuildSourceMode(typeName === 'WebView' ? 'url' : 'html');
             document.querySelectorAll('.project-type-card').forEach(card => {
                 card.classList.remove('border-blue-600', 'bg-blue-50/50');
                 card.classList.add('border-slate-200');
@@ -2125,7 +2157,65 @@
             return new Blob([String(value || '')]).size;
         }
 
+        function getBuildSourceMode() {
+            return window.devloBuildSourceMode || (
+                ((window.currentProjectConfig && window.currentProjectConfig.type) || selectedProjectType) === 'WebView'
+                    ? 'url'
+                    : 'html'
+            );
+        }
+
+        function setBuildSourceMode(mode) {
+            const nextMode = mode === 'html' ? 'html' : 'url';
+            window.devloBuildSourceMode = nextMode;
+
+            const urlTab = document.getElementById('buildSourceUrlTab');
+            const htmlTab = document.getElementById('buildSourceHtmlTab');
+            const urlPanel = document.getElementById('buildUrlSourcePanel');
+            const htmlPanel = document.getElementById('buildHtmlSourcePanel');
+            const badge = document.getElementById('buildSourceBadge');
+
+            if (urlTab) {
+                urlTab.className = nextMode === 'url'
+                    ? 'flex-1 bg-white py-2 rounded-lg shadow-sm text-slate-800 flex items-center justify-center gap-1.5'
+                    : 'flex-1 py-2 text-slate-500 flex items-center justify-center gap-1.5';
+            }
+            if (htmlTab) {
+                htmlTab.className = nextMode === 'html'
+                    ? 'flex-1 bg-white py-2 rounded-lg shadow-sm text-slate-800 flex items-center justify-center gap-1.5'
+                    : 'flex-1 py-2 text-slate-500 flex items-center justify-center gap-1.5';
+            }
+            if (urlPanel) urlPanel.classList.toggle('hidden', nextMode !== 'url');
+            if (htmlPanel) htmlPanel.classList.toggle('hidden', nextMode !== 'html');
+            if (badge) {
+                badge.textContent = nextMode === 'url' ? 'WEBSITE' : 'HTML / CSS / JS';
+                badge.className = nextMode === 'url'
+                    ? 'text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full'
+                    : 'text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full';
+            }
+
+            const htmlInput = document.getElementById('buildHtmlInput');
+            const editor = document.getElementById('codeEditorTextarea');
+            if (nextMode === 'html' && htmlInput && !htmlInput.value.trim() && editor && editor.value.trim()) {
+                htmlInput.value = editor.value;
+            }
+        }
+
+        function openHtmlEditorForBuild() {
+            const htmlInput = document.getElementById('buildHtmlInput');
+            const editor = document.getElementById('codeEditorTextarea');
+            if (htmlInput && editor && htmlInput.value.trim()) {
+                editor.value = htmlInput.value;
+            }
+            if (typeof switchPage === 'function') switchPage('editor');
+            setTimeout(() => {
+                const target = document.getElementById('codeEditorTextarea');
+                if (target) target.focus();
+            }, 100);
+        }
+
         function getBuildSourceCode() {
+            const mode = getBuildSourceMode();
             const websiteUrlInput = document.getElementById('appWebsiteUrlInput');
             const websiteUrl = String(
                 websiteUrlInput && websiteUrlInput.value
@@ -2133,13 +2223,17 @@
                     : (window.currentProjectConfig && window.currentProjectConfig.websiteUrl) || ''
             ).trim();
 
-            // WebView projects always generate a URL-backed main HTML file.
-            // This takes precedence over editor contents so the downloaded package
-            // opens the exact Website URL selected for the project.
-            const projectType = (window.currentProjectConfig && window.currentProjectConfig.type) || selectedProjectType;
-            if (projectType === 'WebView') {
+            if (mode === 'url') {
                 if (!websiteUrl) {
-                    throw new Error('WebView project is missing its Website URL.');
+                    throw new Error('Website URL is required for URL-based APK builds.');
+                }
+                try {
+                    const parsed = new URL(websiteUrl);
+                    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname) {
+                        throw new Error();
+                    }
+                } catch (_) {
+                    throw new Error('Please enter a valid Website URL starting with http:// or https://.');
                 }
 
                 if (window.currentProjectConfig) {
@@ -2164,22 +2258,16 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 </html>`;
             }
 
-            // Blank projects always start from a clean empty HTML document.
-            if (projectType === 'Blank') {
-                const editor = document.getElementById('codeEditorTextarea');
-                const editorCode = editor ? editor.value : '';
-                return editorCode.trim() ? editorCode : BLANK_PROJECT_TEMPLATE;
-            }
-
-            // Kotlin/Java projects are represented by a placeholder HTML file.
-            if (projectType === 'Kotlin/Java') {
-                return KOTLIN_JAVA_PLACEHOLDER_TEMPLATE;
-            }
+            const directHtml = getInputValue('buildHtmlInput', '');
+            if (directHtml) return directHtml;
 
             const editor = document.getElementById('codeEditorTextarea');
             const editorCode = editor ? editor.value : '';
             if (editorCode.trim()) return editorCode;
 
+            const projectType = (window.currentProjectConfig && window.currentProjectConfig.type) || selectedProjectType;
+            if (projectType === 'Blank') return BLANK_PROJECT_TEMPLATE;
+            if (projectType === 'Kotlin/Java') return KOTLIN_JAVA_PLACEHOLDER_TEMPLATE;
             return BLANK_PROJECT_TEMPLATE;
         }
 
@@ -2380,7 +2468,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
                 websiteUrl,
                 versionName: getInputValue('versionNameInput', '1.0') || '1.0',
                 versionCode: String(Math.max(1, parseInt(getInputValue('versionCodeInput', '1'), 10) || 1)),
-                sourceType: projectType === 'WebView' ? 'WebView' : (projectType === 'Blank' ? 'Blank' : (projectType === 'Kotlin/Java' ? 'Kotlin/Java (Placeholder)' : (editorCodeAvailable() ? 'HTML/CSS/JS' : projectType))),
+                sourceType: getBuildSourceMode() === 'url' ? 'WebView' : 'HTML/CSS/JS',
                 sourceCode,
                 customCss,
                 customJs,
@@ -3608,6 +3696,16 @@ self.addEventListener('fetch', event => {
                 `;
             });
         });
-    </script>
+    
+
+        // Keep the APK source controls synchronized with the current project.
+        document.addEventListener('DOMContentLoaded', () => {
+            setBuildSourceMode(
+                ((window.currentProjectConfig && window.currentProjectConfig.type) || selectedProjectType) === 'WebView'
+                    ? 'url'
+                    : 'html'
+            );
+        });
+</script>
 </body>
 </html>
